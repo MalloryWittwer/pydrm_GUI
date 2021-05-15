@@ -160,9 +160,11 @@ class SegmentationFrame(HostF):
     def display_segmentation(self):
         '''Shows segmentation on the canvas'''
         if self.seg_visibility:
+            # Make segmentation 50% opaque
             self.segmentation[:,:,3] = 128
             self.canvas.update_color('red')
         else:
+            # Make segmentation fully transparent
             self.segmentation[:,:,3] = 0
             self.canvas.update_color('')
         
@@ -215,7 +217,7 @@ class SegmentationFrame(HostF):
         self.gsize = np.frombuffer(s, np.uint8).reshape((height, width, 4))
         
         self.host_canvas.show_rgba(self.gsize)
-        self.master_object.nbk.select(1)
+        self.master_object.nbk.select(2)
 
         segmentation = plt.cm.jet(segmentation/np.max(segmentation))*255
         segmentation[gbs] *= 0
@@ -227,7 +229,7 @@ class SegmentationFrame(HostF):
         self.display_segmentation()
         
     def run_lrc_mrm(self, dataset_slice, compressor, sample_size):
-        
+        '''Runs the segmentation.'''
         t0 = time.time()
         
         # Start progress bar
@@ -272,4 +274,5 @@ class SegmentationFrame(HostF):
         segmentation = dataset_slice.get('segmentation').reshape((rx, ry))
         gbs = dataset_slice.get('boundaries').reshape((rx, ry))
         
+        # Return segmentation map and grain boundary map
         return segmentation, gbs

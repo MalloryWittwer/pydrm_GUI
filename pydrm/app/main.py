@@ -1,5 +1,9 @@
 '''
-Tkinter app intended for visualizing and manipulating DRM datasets.
+Tkinter app for visualizing and manipulating DRM datasets.
+This version features: 
+    - a downsampling module
+    - a grain segmentation module
+    - a functionally graded binary phase classification module
 '''
 import os
 import pathlib
@@ -17,17 +21,13 @@ from .canvas_microstructure import MicroDisplayCan
 from .frame_mapping import MappingFrame
 from .frame_resize import ResizeFrame
 from .frame_scalers import FrameScalers
-
 from .frame_segmentation import SegmentationFrame
 
 class AppAnalysis(tk.Frame):
     '''
-    Tkinter application for DRM analysis. Work in progress!
+    Main app. Gets instanciated from app.py.
     '''
     def __init__(self, master=None, size=500):
-        '''
-        Instantiates the GUI application.
-        '''
         # Initialize super() class --------------------------------------------
         tk.Frame.__init__(self, master)
         
@@ -100,7 +100,6 @@ class AppAnalysis(tk.Frame):
         self.canvas3 = HostCanvas(self.nbk, w, h)
         self.nbk.add(self.canvas3, text='Training')
         self.nbk.grid(row=2, column=1, padx=gpadx, pady=gpady)
-        
         self.canvas4 = HostCanvas(self.nbk, w, h)
         self.nbk.add(self.canvas4, text='Grain size')
         
@@ -139,7 +138,8 @@ class AppAnalysis(tk.Frame):
         '''
         Sets initial GUI configuration.
         '''
-        self.flag_release = 0 # flag_release: codes what to do when click-and-dragging.
+        # self.flag_release: encodes what to do when click-and-dragging.
+        self.flag_release = 0
         
         # Reset all widgets
         self.frame_resize.set_init_configuration()
@@ -187,7 +187,7 @@ class AppAnalysis(tk.Frame):
         '''
         On close setup.
         '''
-        self.flag_release = 0 # flag_release: codes what to do when click-and-dragging.
+        self.flag_release = 0
         
         # Reset all widgets
         self.frame_resize.on_close_setup()
@@ -250,7 +250,7 @@ class AppAnalysis(tk.Frame):
         else:
             self.log_message('> Error: File is not NPY.')
             return 0
-        
+        # Launch import setup configuration
         self.on_import_setup(data)
     
     def set_flag_release(self, val):
@@ -275,6 +275,6 @@ class AppAnalysis(tk.Frame):
         elif self.flag_release==3: # Select class C2
             self.frame_mapping.select_C2(data_slice, sx, sy, ex, ey)
         
-        else: # Segment field of view
+        else: # Grain segmentation in the sliced field of view
             self.frame_segment.update_starters(sx, sy)
             self.frame_segment.segmentation_pipeline(data_slice)
