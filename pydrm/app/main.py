@@ -18,6 +18,8 @@ from .frame_mapping import MappingFrame
 from .frame_resize import ResizeFrame
 from .frame_scalers import FrameScalers
 
+from .frame_segmentation import SegmentationFrame
+
 class AppAnalysis(tk.Frame):
     '''
     Tkinter application for DRM analysis. Work in progress!
@@ -99,6 +101,9 @@ class AppAnalysis(tk.Frame):
         self.nbk.add(self.canvas3, text='Training')
         self.nbk.grid(row=2, column=1, padx=gpadx, pady=gpady)
         
+        self.canvas4 = HostCanvas(self.nbk, w, h)
+        self.nbk.add(self.canvas4, text='Grain size')
+        
         # Live DRP ------------------------------------------------------------
         self.frame_movdrp = MovDRPCan(self.master, self.canvas1, self)
         
@@ -118,6 +123,9 @@ class AppAnalysis(tk.Frame):
         self.frame_resize = ResizeFrame(
             self.cmd_nbk, w, h, self.canvas0, self.pbar, self)
         self.cmd_nbk.add(self.frame_resize, text='Downscaling')
+        self.frame_segment = SegmentationFrame(
+            self.cmd_nbk, w, h, self.canvas0, self.canvas4, self.pbar, self)
+        self.cmd_nbk.add(self.frame_segment, text='Segmentation')
         self.frame_mapping = MappingFrame(
             self.cmd_nbk, w, h, self.canvas0, self.canvas3, self.pbar, self)
         self.cmd_nbk.add(self.frame_mapping, text='Machine Learning')
@@ -136,6 +144,7 @@ class AppAnalysis(tk.Frame):
         # Reset all widgets
         self.frame_resize.set_init_configuration()
         self.canvas0.set_init_configuration()
+        self.frame_segment.set_init_configuration()
         self.frame_fixdrp.set_init_configuration()
         self.frame_movdrp.set_init_configuration()
         self.frame_scalers.set_init_configuration()
@@ -160,6 +169,7 @@ class AppAnalysis(tk.Frame):
         # Setup every widget on import
         self.frame_resize.on_import_setup()
         self.canvas0.on_import_setup()
+        self.frame_segment.on_import_setup()
         self.frame_fixdrp.on_import_setup()
         self.frame_movdrp.on_import_setup()
         self.frame_scalers.on_import_setup()
@@ -182,6 +192,7 @@ class AppAnalysis(tk.Frame):
         # Reset all widgets
         self.frame_resize.on_close_setup()
         self.canvas0.on_close_setup()
+        self.frame_segment.on_close_setup()
         self.frame_fixdrp.on_close_setup()
         self.frame_movdrp.on_close_setup()
         self.frame_scalers.on_close_setup()
@@ -264,4 +275,7 @@ class AppAnalysis(tk.Frame):
         elif self.flag_release==3: # Select class C2
             self.frame_mapping.select_C2(data_slice, sx, sy, ex, ey)
         
-        # self.flag_release = 0 # Default: do nothing!
+        else: # Segment field of view
+            self.frame_segment.update_starters(sx, sy)
+            self.frame_segment.segmentation_pipeline(data_slice)
+            # self.flag_release = 0

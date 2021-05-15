@@ -4,13 +4,13 @@ Utility functions
 
 from time import perf_counter
 import numpy as np
-import cv2
-from PIL import Image
+# import cv2
+# from PIL import Image
 import matplotlib.pyplot as plt
-import os
-import re
-import pandas as pd
-import glob
+# import os
+# import re
+# import pandas as pd
+# import glob
 
 def timeit(method):
     '''
