@@ -1,0 +1,14 @@
+*** V1.0.0 Release Notes ***
+@Mallory Wittwer, 21.10.2020
+
+Upcoming features:
+- Resizable layout
+- Improved styling
+- Export and save figures
+- Orientation mapping
+- More image processing
+- Improve DRP formatting
+- Dim. reduction pannel
+
+Identified bugs:
+- Closing files after seg.
