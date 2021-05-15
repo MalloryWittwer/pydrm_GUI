@@ -262,7 +262,7 @@ class AppAnalysis(tk.Frame):
         '''Action taken when click-and-dragging on the canvas.'''
         
         data_slice = self.data[sy:ey,sx:ex]
-        print('Data slice: ', data_slice.shape)
+        self.log_message(f'> Selected data slice: {data_slice.shape}')
         
         if self.flag_release==1: # Crop field of view
             self.canvas0.delete_rectangle()
@@ -278,4 +278,3 @@ class AppAnalysis(tk.Frame):
         else: # Segment field of view
             self.frame_segment.update_starters(sx, sy)
             self.frame_segment.segmentation_pipeline(data_slice)
-            # self.flag_release = 0

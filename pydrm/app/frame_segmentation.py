@@ -6,9 +6,15 @@ from sklearn.decomposition import NMF, PCA
 from PIL import Image, ImageTk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+from sklearn.linear_model import LogisticRegression
 
 from .host_frame import HostF
-from pydrm.utils import run_lrc_mrm, size_dist_plot, shuffler
+from pydrm.utils import (
+    fit_lrc_model, 
+    lrc_mrm_segmentation, 
+    size_dist_plot, 
+    shuffler,
+    )
 
 class DataCompressor():
     def __init__(self, compressor=None):
@@ -179,15 +185,9 @@ class SegmentationFrame(HostF):
     
     def segmentation_pipeline(self, data_slice=None):
         '''Performs one round of segmentation on the provided data subset.'''
-        t0 = time.time()
-        
+                
         # Collect segmentation parameters from pannel
         sample_size, compressor = self.update_seg_params()
-        
-        # # Start progress bar
-        # self.pbar.start()
-        # self.pbar.step(10)
-        # self.master.update_idletasks()
         
         # Creating a dataset
         rx, ry, s0, s1 = data_slice.shape
@@ -197,35 +197,10 @@ class SegmentationFrame(HostF):
             'angular_resol':(s0,s1),
             }
         
-        segmentation, gbs = run_lrc_mrm(dataset, compressor, sample_size)
-
-        # # Data compression
-        # self.master_object.log_message('> Compressing data...')
-        # compressor = DataCompressor(self.compressor)
-        # compressor.fit(dataset, sample_size = np.min((rx*ry, self.ms)))
-        # data_compressed = compressor.transform(dataset.get('data'))
-        # dataset['data'] = data_compressed
+        segmentation, gbs = self.run_lrc_mrm(
+            dataset, compressor, 
+            sample_size = rx*ry if rx*ry <= sample_size else sample_size)
         
-        # self.pbar.step(30)
-        # self.master.update_idletasks()
-        
-        # # LRC model fitting
-        # self.master_object.log_message('> Fitting model...')
-        # model, metrics = fit_model(dataset,
-        #                             model=LogisticRegression(penalty='none'),
-        #                             training_set_size=np.min((rx*ry,self.ms)))
-        
-        # self.pbar.step(30)
-        # self.master.update_idletasks()
-        # self.master_object.log_message('> Segmenting domain...')
-        
-        # # LRC-Merging
-        # dataset, _ = hierarchical_merging(dataset, model, p_limit=0.5)
-        
-        # # Collect segmentation data and format it nicely
-        # segmentation = dataset.get('segmentation').reshape((rx,ry))
-        # gbs = dataset.get('boundaries').reshape((rx,ry))
-
         ### GRAIN SIZE DISTRIBUTION PLOT
         ngrains = np.unique(segmentation).size
         fig = size_dist_plot(dataset, limdown=0, limup=1000, gsize=100)
@@ -245,23 +220,56 @@ class SegmentationFrame(HostF):
         segmentation = plt.cm.jet(segmentation/np.max(segmentation))*255
         segmentation[gbs] *= 0
         self.segmentation = segmentation.astype(np.uint8)
-        
-        # # Stop progress bar
-        # self.pbar.step(30)
-        # self.master.update_idletasks()
-        # self.master_object.log_message(
-        #     '> Domain segmented! ({:.2f} sec)'.format(time.time()-t0)
-        #     )
-        # time.sleep(0.5)
-        # self.pbar.stop()
-        
+
         # Display the result
+        self.seg_visibility = True
+        self.visibutton.select()
         self.display_segmentation()
         
-        self.master_object.log_message('> Finished segmenting! ({:.2f} sec.)'.format(time.time()-t0))
-
+    def run_lrc_mrm(self, dataset_slice, compressor, sample_size):
         
-# if __name__=='__main__':
-#     root = tk.Tk()
-#     app = SegmentationFrame(root, ws=800)
-#     root.mainloop()
+        t0 = time.time()
+        
+        # Start progress bar
+        self.pbar.start()
+        self.pbar.step(10)
+        self.master.update_idletasks()
+    
+        # Data compression
+        self.master_object.log_message('> Compressing data...')
+    
+        compressor.fit(dataset_slice, sample_size)
+        compressed_dataset = compressor.transform(dataset_slice['data'])
+        dataset_slice['data'] = compressed_dataset
+        
+        self.pbar.step(30)
+        self.master.update_idletasks()
+        # LRC model fitting
+        self.master_object.log_message('> Fitting model...')
+        
+        dataset_slice = fit_lrc_model(
+            dataset_slice,
+            model=LogisticRegression(penalty='none', max_iter=2000), 
+            training_set_size=sample_size,
+        )
+    
+        self.pbar.step(30)
+        self.master.update_idletasks()
+        self.master_object.log_message('> Segmenting domain...')
+    
+        dataset_slice = lrc_mrm_segmentation(dataset_slice)
+        
+        # Stop progress bar
+        self.pbar.step(30)
+        self.master.update_idletasks()
+        self.master_object.log_message(
+            '> Domain segmented! ({:.2f} sec)'.format(time.time()-t0)
+            )
+        time.sleep(0.5)
+        self.pbar.stop()
+        
+        rx, ry = dataset_slice.get('spatial_resol')
+        segmentation = dataset_slice.get('segmentation').reshape((rx, ry))
+        gbs = dataset_slice.get('boundaries').reshape((rx, ry))
+        
+        return segmentation, gbs

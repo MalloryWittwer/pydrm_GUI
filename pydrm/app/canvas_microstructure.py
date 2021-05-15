@@ -68,6 +68,9 @@ class MicroDisplayCan(HostCanvas):
         self.update_color(flag_release_colors[self.master_object.flag_release])
         
         self.delete_rectangle()
+        self.master_object.frame_segment.seg_visibility = False
+        if self.master_object.frame_segment.segmentation is not None:
+            self.master_object.frame_segment.display_segmentation()
 
     def on_button_release(self, event):
         self.startx, self.endx = np.sort([self.startx, self.endx])

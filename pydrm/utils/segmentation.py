@@ -3,7 +3,6 @@ from skimage.future.graph import RAG
 import heapq
 from skimage.segmentation import find_boundaries
 from skimage.morphology import skeletonize
-from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.ticker import PercentFormatter
@@ -66,24 +65,7 @@ def size_dist_plot(dataset, limdown=0, limup=1000, gsize=100):
     
     return fig
 
-def run_lrc_mrm(dataset_slice, compressor, sample_size):
-    compressor.fit(dataset_slice, sample_size)
-    compressed_dataset = compressor.transform(dataset_slice['data'])
-    dataset_slice['data'] = compressed_dataset
-    dataset_slice = _fit_lrc_model(
-        dataset_slice,
-        model=LogisticRegression(penalty='none', max_iter=2000), 
-        training_set_size=sample_size,
-    )
-    dataset_slice = _lrc_mrm_segmentation(dataset_slice)
-    
-    rx, ry = dataset_slice.get('spatial_resol')
-    segmentation = dataset_slice.get('segmentation').reshape((rx, ry))
-    gbs = dataset_slice.get('boundaries').reshape((rx, ry))
-    
-    return segmentation, gbs
-
-def _lrc_mrm_segmentation(dataset):
+def lrc_mrm_segmentation(dataset):
     '''
     Implementation of the multi-region merging segmentation controlled by 
     a trained classifier model. Design of the function was originally inspired 
@@ -163,7 +145,7 @@ def _lrc_mrm_segmentation(dataset):
     
     return dataset
 
-def _fit_lrc_model(dataset, model, training_set_size):
+def fit_lrc_model(dataset, model, training_set_size):
     '''Fits a model, computes precision, recall and accuracy'''
     training_set = _get_sample_set(dataset, training_set_size)
     model.fit(training_set['x'], training_set['y'])
