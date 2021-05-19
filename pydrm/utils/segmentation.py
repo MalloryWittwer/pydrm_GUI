@@ -75,7 +75,7 @@ def lrc_mrm_segmentation(dataset):
     # Collect spatial resolution and data from dataset
     rx, ry = dataset.get('spatial_resol')
     data = dataset.get('data')
-    model = dataset.get('lrc_model')
+    model = dataset.get('lrc_model')    
     
     # Define merging decision function
     mdf = lambda vect:model.predict_proba(np.atleast_2d(vect))[0,1]

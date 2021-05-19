@@ -34,7 +34,7 @@ class DataCompressor():
             data_extract, _ = shuffler(data, sample_size)
             
             # Fit the compressor
-            self.compressor.fit(data_extract)
+            self.compressor.fit(data_extract)            
 
     def transform(self, data):
         '''Compresses the data in the input dataset'''
@@ -246,9 +246,10 @@ class SegmentationFrame(HostF):
         
         self.pbar.step(30)
         self.master.update_idletasks()
+        
         # LRC model fitting
         self.master_object.log_message('> Fitting model...')
-        
+
         dataset_slice = fit_lrc_model(
             dataset_slice,
             model=LogisticRegression(penalty='none', max_iter=2000), 
