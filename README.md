@@ -8,4 +8,24 @@ This version includes a **grain segmentation panel** which lets the user compute
 
 ## Installation
 
-We recommend installing Python > 3.6 and the dependencies in `requirements.txt` in a fresh environment. The app can be started by running `app.py`.
+We recommend installing Python > 3.6 and the dependencies in `requirements.txt` in a fresh environment. Alternatively, one can execute the code in the provided virtual environement **environment.yml** using [conda](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) (to install Anaconda: see [here](https://www.anaconda.com/)). To create the environement, use:
+
+`conda env create -f environment.yml`
+
+This will create an environment with the name *drm_ml*. To activate that environment, use:
+
+`conda activate drm_ml`
+
+We tested the code using the following dependencies:
+
+- python 3.6.13
+- numpy 1.19.2
+- pandas 1.1.5
+- matplotlib 3.3.4
+- scikit-image 0.17.2
+- scikit-learn 0.24.2
+- tensorflow 2.1.0
+
+## Execution
+
+The app can be started by running `app.py`.
