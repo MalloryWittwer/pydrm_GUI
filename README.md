@@ -18,13 +18,14 @@ This will create an environment with the name *drm_ml*. To activate that environ
 
 We tested the code using the following dependencies:
 
-- python 3.6.13
-- numpy 1.19.2
-- pandas 1.1.5
-- matplotlib 3.3.4
-- scikit-image 0.17.2
+- python 3.8.10
+- numpy 1.19.5
+- pandas 1.3.1
+- matplotlib 3.4.2
+- scikit-image 0.18.2
 - scikit-learn 0.24.2
-- tensorflow 2.1.0
+- tensorflow 2.5.0
+- psutil 5.8.0
 
 ## Execution
 
