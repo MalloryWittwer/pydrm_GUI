@@ -8,7 +8,7 @@ This version includes a **grain segmentation panel** which lets the user compute
 
 ## Installation
 
-We recommend installing Python > 3.6 and the dependencies in `requirements.txt` in a fresh environment. Alternatively, one can execute the code in the provided virtual environement **environment.yml** using [conda](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) (to install Anaconda: see [here](https://www.anaconda.com/)). To create the environement, use:
+We recommend installing Python > 3.6 and the dependencies listed in `requirements.txt` in a fresh environment. Alternatively, one can execute the code in the provided virtual environement **environment.yml** using [conda](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) (to install Anaconda: see [here](https://www.anaconda.com/)). To create the environement, use:
 
 `conda env create -f environment.yml`
 
